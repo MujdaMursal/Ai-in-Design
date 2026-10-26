@@ -42,7 +42,7 @@ Buildings: 3D building models LoD2 © GDI-Th (dl-de/by-2-0). Land use and pedest
 ## How this was made
 
 1. Tools: Claude Code, with the model Claude Opus 5.5.
-2. I decided:⁠I decided: to create a game, in which weimar is flooded and waterlevels rise, with the increasing amount of water it adds fishes and sharks. Starting from small to bigger, for the final watermark i wanted to add a end level creature which is a craken who feeds off of boats. To make it interactive i wanted it to throw human into the water with each mouseclick so as to feed the fishes in the water. While eating them they get bigger as a result. this causes them to grow and rise in levels.
+2. I decided: to create a game, in which weimar is flooded and waterlevels rise, with the increasing amount of water it adds fishes and sharks. Starting from small to bigger, for the final watermark i wanted to add a end level creature which is a craken who feeds off of boats. To make it interactive i wanted it to throw human into the water with each mouseclick so as to feed the fishes in the water. While eating them they get bigger as a result. this causes them to grow and rise in levels.
 
 3. The agent did: read the city kit, wrote the 3D app (React Three Fiber), the walking and census calculation and this README, and tested the calculation and the Pages build.
 4. I checked: First I checked if the water levels rose. after that i checked if there are any fishes in the water. after that i controlled if the clicking worked and realised it would be more fun if the humans screamed. so i added that afterwards.
