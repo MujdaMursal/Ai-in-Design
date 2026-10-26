@@ -46,6 +46,9 @@ export default function App() {
         <h1>How far can you walk?</h1>
         <a className="switch" href={`${import.meta.env.BASE_URL}corridor.html`}>
           Map: Bauhaus-Universität to Hauptbahnhof →
+        </a>{' '}
+        <a className="switch" href={`${import.meta.env.BASE_URL}flood.html`}>
+          Game: Weimar under water →
         </a>
         <p className="hint">
           {busy

@@ -10,12 +10,14 @@ const base = repo && !repo.endsWith('.github.io') ? `/${repo}/` : '/'
 export default defineConfig({
   plugins: [react()],
   base,
-  // Two pages: the walking app (index.html) and the Bauhaus–Hauptbahnhof map (corridor.html).
+  // Three pages: the walking app (index.html), the Bauhaus–Hauptbahnhof map (corridor.html)
+  // and the flood game (flood.html).
   build: {
     rollupOptions: {
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
         corridor: resolve(import.meta.dirname, 'corridor.html'),
+        flood: resolve(import.meta.dirname, 'flood.html'),
       },
     },
   },

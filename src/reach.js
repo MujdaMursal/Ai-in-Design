@@ -32,7 +32,7 @@ function segmentsCross(a, b, c, d) {
 }
 
 // Even-odd test over all rings, so courtyards (holes) count as outside.
-function insideRings(x, y, rings) {
+export function insideRings(x, y, rings) {
   let inside = false
   for (const ring of rings) {
     for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {

@@ -6,6 +6,8 @@ Click on the ground. The app finds the nearest junction of the pedestrian networ
 
 A second page, `corridor.html`, is a 3D map of the area between the Bauhaus-Universität main building and Weimar Hauptbahnhof. It shows every building within 250 m of the straight line between the two, coloured by use, with both buildings labelled in orange and the shortest walk between them in blue (about 2.1 km, 26 minutes). The kit has no building names, so the two buildings were picked by their location (ids `14780` and `22132`). The panel sums up the buildings in the area: count and floor area per main use, and the range of heights. Click a building to see its use, height, floors and floor area by use. Floor areas are estimates for the whole building, not surveyed. Each page links to the other.
 
+A third page, `flood.html`, is a game: "Weimar under water". A slider raises the water from 0 to 40 m, and more and bigger fish and boats appear as it rises, from small fish and rubber dinghies to sharks, whales, a kraken and cruise ships. A click drops a screaming person: fish and sharks race the boats to reach them. Fish level up by eating and grow with every level; badges over the fish and a progress panel show their levels and your own. Once the kraken has grown, it hunts boats up to half its length, and the boats flee. The sounds are made in the browser, with no sound files, and can be muted. It is not a flood model. The kit has no ground heights, so the whole area floods evenly like a bathtub. Only the building heights are real.
+
 ## Run it
 
 ```

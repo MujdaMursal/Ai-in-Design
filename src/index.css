@@ -170,6 +170,197 @@ td {
   color: #333;
 }
 
+.slider {
+  display: block;
+  margin: 4px 0 2px;
+}
+
+.slider input {
+  width: 100%;
+  margin: 6px 0 0;
+}
+
+.panel .muted {
+  margin: 4px 0 10px;
+  color: #555;
+  font-size: 12px;
+}
+
+.score td {
+  padding: 3px 0;
+}
+
+.small {
+  margin: 12px 0 4px;
+  font-size: 13px;
+}
+
+.species {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.species li {
+  display: flex;
+  align-items: center;
+  margin: 2px 0;
+}
+
+.species li .num {
+  margin-left: auto;
+}
+
+.species .later {
+  color: #999;
+}
+
+.mute {
+  margin: 0 0 8px;
+  padding: 3px 10px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.bar {
+  display: block;
+  height: 6px;
+  margin: 4px 0;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.bar i {
+  display: block;
+  height: 100%;
+  background: #2747b8;
+  transition: width 0.3s;
+}
+
+.progress {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 250px;
+  max-height: calc(100% - 80px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.progress h2 {
+  margin: 0 0 2px;
+  font-size: 14px;
+}
+
+.progress .muted {
+  margin: 0 0 6px;
+  color: #555;
+  font-size: 12px;
+}
+
+.leaders {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.leaders li {
+  margin: 0 0 8px;
+}
+
+.leaders small {
+  color: #666;
+}
+
+.kraken-status {
+  margin: 8px 0 0;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #3a0a16;
+  color: #ffd9d9;
+  font-size: 12px;
+}
+
+.badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 90px;
+  padding: 3px 7px 1px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.badge .bar {
+  height: 4px;
+  margin: 2px 0;
+}
+
+.badge.kraken {
+  z-index: 1;
+  background: #3a0a16;
+  color: #ffd9d9;
+  font-size: 13px;
+}
+
+.badge.kraken .bar i {
+  background: #ff3b00;
+}
+
+.toasts {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 6px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  font-size: 13px;
+  font-weight: 600;
+  animation: pop 0.25s ease-out;
+}
+
+.toast.danger {
+  background: #3a0a16;
+  color: #ffd9d9;
+}
+
+.toast.rank {
+  background: #2747b8;
+  color: #fff;
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
 .details {
   margin-top: 14px;
 }
@@ -244,7 +435,8 @@ td {
     max-height: 45%;
   }
   .legend,
-  .card {
+  .card,
+  .progress {
     top: auto;
     bottom: 56px;
     font-size: 11px;
