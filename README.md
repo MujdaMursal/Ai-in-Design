@@ -46,3 +46,22 @@ Buildings: 3D building models LoD2 © GDI-Th (dl-de/by-2-0). Land use and pedest
 
 3. The agent did: read the city kit, wrote the 3D app (React Three Fiber), the walking and census calculation and this README, and tested the calculation and the Pages build.
 4. I checked: First I checked if the water levels rose. after that i checked if there are any fishes in the water. after that i controlled if the clicking worked and realised it would be more fun if the humans screamed. so i added that afterwards.
+
+## Part 2: the kraken judge
+
+In "Weimar under water" the kraken becomes a judge that watches how I play and punishes me when I am cruel. The game counts my clicks and distances; Claude reads these facts and decides by itself what the kraken does and says.
+
+1. **What does it notice?** How often I drop people, and where each one lands: closer to a fish or shark or closer to a boat that could save them. It also remembers its last four verdicts.
+2. **When does it think?** By itself every 30 seconds if I dropped anyone, right away if I drop 5 people in a row closer to a fish or shark than to a boat, and after 60 seconds if I drop nobody at all.
+3. **What does it do?** It picks one of four actions and says a line in a speech bubble: **spare** me, **warn** me, **sink a building**, or **mock my silence**. When it sinks a building, the real Weimar building nearest to my drops is pulled under, and it stays gone until I reload the page.
+
+### How it works
+
+- **The character.** The kraken is a theatrical, sarcastic diva that roasts me with sea puns, and a harsh judge: when in doubt it picks the harsher action, it never warns twice in a row, and it sinks a building at once, without a warning, when most drops were doomed. It still spares me (grudgingly, with an insult) when I play fair. Its system prompt is in `server/kraken.js`.
+- **The model.** Claude Haiku through Claude Code on my laptop (`claude -p`), on my own Claude account: no key and nothing secret in the repository. The dev server (`npm run dev`) has a small endpoint, `/api/kraken` (`server/kraken.js`), that runs `claude -p --safe-mode --tools "" --model haiku --effort low --output-format json --no-session-persistence` with the kraken's system prompt and a `--json-schema` that allows only the four actions. Without tools, nothing sent from the page can make it read files or run commands.
+- **What is sent.** A few lines of plain text (`src/judge.js`): why it is asked (30-second check, 5 doomed drops, or silence), the seconds since its last verdict, the water level, the number of drops and drops per minute, how many fell into water and how many were closer to a fish or shark than to a boat, each drop with its distances, and its last four verdicts.
+- **What comes back.** One action (`spare`, `warn`, `sink_building` or `mock_silence`), what it noticed, a one-sentence reason, and what it says. The game carries out the action; Claude decides the action, the game decides which building. If it picks `sink_building` when nobody was dropped, the game turns it into a warning.
+- **How often.** At most once every 30 seconds while I play, plus the immediate check after 5 doomed drops; one at a time. When I drop nobody, once a minute, at most 5 times in a row and only while the tab is open. Each answer takes about 3 to 5 seconds and counts towards my Claude usage limit.
+- **Visible reasoning.** The speech bubble over the kraken (or at the bottom of the screen before it rises), and "The kraken's log" in the panel: time, action, what it noticed, why, what it did, and its words.
+- **The punishment.** For 3 seconds a red beam rises from the chosen building and it flashes red, drawn over the water so it shows even when flooded, with a label "Destroyed by your cruelty" and its use and height. Then it rumbles, shakes and sinks, and fish can swim where it stood. A red outline of its footprint stays for 5 seconds, then only the empty space is left. The panel lists every building destroyed.
+- **Only local.** On GitHub Pages there is no dev server, so the kraken sleeps and the panel says that it only thinks on localhost; the game itself works.

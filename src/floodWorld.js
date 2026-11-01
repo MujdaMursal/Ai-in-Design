@@ -190,6 +190,8 @@ export class FloodWorld {
     this.agents = [] // fish, boats and the kraken
     this.people = []
     this.splashes = []
+    this.sinking = [] // buildings the kraken is pulling under
+    this.scars = [] // where they stood: a red outline, for 5 seconds after sinking
     this.events = []
     this.score = { fed: 0, rescued: 0, boatsEaten: 0 }
     this.buildHeights(data.houses)
@@ -423,6 +425,133 @@ export class FloodWorld {
     }
   }
 
+  // The nearest fish or boat to a point: { name, distance } (distance Infinity if there is none).
+  nearest(x, y, boat) {
+    let best = { name: null, distance: Infinity }
+    for (const a of this.agents) {
+      if (Boolean(a.sp.boat) !== boat) continue
+      const d = Math.hypot(a.x - x, a.y - y)
+      if (d < best.distance) best = { name: a.sp.name, distance: d }
+    }
+    return best
+  }
+
+  // ---------- the kraken's punishment ----------
+
+  // Pulls a building under, in three steps so you can't miss which one:
+  // 1. warning (3 s): a red beam shoots up from it and it flashes red, drawn over the water;
+  // 2. it shakes; 3. it sinks into the ground. A red outline of its footprint stays on the water
+  // for 5 seconds, then only the empty space is left.
+  // Its roof-height squares become open water, so fish can swim where it stood.
+  sinkBuilding(house, colour, label) {
+    const [x0, y0] = this.extent
+    const [bx0, by0, bx1, by1] = house.bbox
+    for (let i = Math.max(0, Math.floor((bx0 - x0) / CELL)); i <= Math.min(this.nx - 1, Math.floor((bx1 - x0) / CELL)); i++) {
+      for (let j = Math.max(0, Math.floor((by0 - y0) / CELL)); j <= Math.min(this.ny - 1, Math.floor((by1 - y0) / CELL)); j++) {
+        if (insideRings(x0 + (i + 0.5) * CELL, y0 + (j + 0.5) * CELL, house.rings)) this.heights[j * this.nx + i] = 0
+      }
+    }
+    // A copy of the building, drawn on its own so it can move: footprint extruded to its height,
+    // turned so the extrusion points up (shape x, y → three.js x, -z).
+    const [outer, ...holes] = house.rings.map((r) => r.map(([x, y]) => new THREE.Vector2(x, y)))
+    const shape = new THREE.Shape(outer)
+    shape.holes = holes.map((h) => new THREE.Path(h))
+    const h = Math.max(house.height, 0.5)
+    const geometry = new THREE.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false }).rotateX(-Math.PI / 2)
+    // Drawn after the water and through it, so it shows even when it is flooded.
+    const material = new THREE.MeshBasicMaterial({ color: colour, transparent: true, depthTest: false })
+    const mesh = new THREE.Mesh(geometry, material)
+    mesh.renderOrder = 20
+    this.group.add(mesh)
+
+    const x = (bx0 + bx1) / 2
+    const y = (by0 + by1) / 2
+    const size = Math.max(bx1 - bx0, by1 - by0)
+    const beam = new THREE.Mesh(
+      new THREE.CylinderGeometry(Math.max(size * 0.3, 6), Math.max(size * 0.45, 9), 400, 24, 1, true),
+      new THREE.MeshBasicMaterial({ color: '#ff2a00', transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }),
+    )
+    beam.position.set(x, 200, -y)
+    beam.renderOrder = 21
+    this.group.add(beam)
+
+    // The scar: the footprint's outline, for a few seconds after it has sunk.
+    const scar = new THREE.Group()
+    const outline = new THREE.LineLoop(
+      new THREE.BufferGeometry().setFromPoints(house.rings[0].map(([px, py]) => new THREE.Vector3(px, 0, -py))),
+      new THREE.LineBasicMaterial({ color: '#ff2a00', depthTest: false }),
+    )
+    outline.renderOrder = 22
+    scar.add(outline)
+    scar.visible = false
+    this.group.add(scar)
+    this.scars.push({ group: scar, x, y, label, age: 0 })
+
+    this.sinking.push({ mesh, beam, base: new THREE.Color(colour), h, x, y, size, age: 0, nextSplash: 0, scar, label, rumbled: false })
+  }
+
+  moveSinking(dt, t) {
+    const WARN = 3
+    const SHAKE = 1.2
+    const DOWN = 3
+    const red = new THREE.Color('#ff2a00')
+    for (const s of this.sinking) {
+      s.age += dt
+      const pulse = 0.5 + 0.5 * Math.sin(t * 10)
+      if (s.age < WARN) {
+        // Flash between its own colour and red; the beam fades in and pulses.
+        s.mesh.material.color.copy(s.base).lerp(red, pulse)
+        s.beam.material.opacity = Math.min(1, s.age * 2) * (0.25 + 0.3 * pulse)
+        continue
+      }
+      if (!s.rumbled) {
+        s.rumbled = true
+        this.emit({ type: 'collapse', label: s.label })
+      }
+      const k = Math.max(0, Math.min(1, (s.age - WARN - SHAKE) / DOWN))
+      s.mesh.position.set((Math.random() - 0.5) * 2, -s.h * 1.05 * k * k, (Math.random() - 0.5) * 2)
+      s.mesh.material.color.copy(red).lerp(new THREE.Color('#3a0a16'), k)
+      s.mesh.material.opacity = 1 - k * 0.6
+      s.beam.material.opacity = 0.4 * (1 - k)
+      if (s.age >= s.nextSplash) {
+        s.nextSplash = s.age + 0.45
+        this.splash(s.x + (Math.random() - 0.5) * s.size * 0.5, s.y + (Math.random() - 0.5) * s.size * 0.5, s.size * 0.4 + 6)
+      }
+    }
+    for (const s of this.sinking.filter((s) => s.age > WARN + SHAKE + DOWN)) {
+      for (const o of [s.mesh, s.beam]) {
+        this.group.remove(o)
+        o.geometry.dispose()
+        o.material.dispose()
+      }
+      s.scar.visible = true
+    }
+    this.sinking = this.sinking.filter((s) => s.age <= WARN + SHAKE + DOWN)
+    // Scars float on the water (or lie on the ground while it is dry) and go after 5 seconds.
+    const SCAR_FOR = 5
+    for (const scar of this.scars) {
+      scar.group.position.y = this.level + 0.5
+      if (scar.group.visible) scar.age += dt
+    }
+    for (const scar of this.scars.filter((c) => c.age > SCAR_FOR)) {
+      this.group.remove(scar.group)
+      scar.group.traverse((o) => {
+        o.geometry?.dispose()
+        o.material?.dispose()
+      })
+    }
+    this.scars = this.scars.filter((c) => c.age <= SCAR_FOR)
+  }
+
+  // Where the destroyed buildings were and what is happening there, for the labels on screen.
+  // `active` is true while it is still flashing or sinking.
+  destroyed() {
+    return [
+      ...this.sinking.map((s) => ({ x: s.x, y: s.y, z: this.level + s.h + 12, label: s.label, active: true })),
+      ...this.scars.filter((c) => c.group.visible).map((c) => ({ x: c.x, y: c.y, z: this.level + 12, label: c.label, active: false })),
+    ]
+  }
+
   // ---------- people ----------
 
   // Drops a person and returns how long the fall takes, in seconds, and where it ends.
@@ -499,6 +628,7 @@ export class FloodWorld {
     const kraken = this.krakenAgent()
     for (const a of this.agents) this.move(a, dt, t, kraken)
     for (const p of [...this.people]) this.movePerson(p, dt, t)
+    this.moveSinking(dt, t)
 
     for (const s of this.splashes) {
       s.age += dt

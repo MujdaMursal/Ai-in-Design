@@ -443,3 +443,159 @@ td {
     padding: 6px 10px;
   }
 }
+
+/* The kraken judge's speech bubble: over the kraken's head, or from the deep before it rises. */
+.kraken-bubble {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  max-width: 300px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: #fff;
+  color: #3a0a16;
+  border: 2px solid #3a0a16;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1.35;
+  pointer-events: none;
+  animation: pop 0.25s ease-out;
+}
+
+.kraken-bubble[hidden] {
+  display: none;
+}
+
+.kraken-bubble small {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.kraken-bubble.sink_building {
+  background: #3a0a16;
+  color: #ffd9d9;
+  border-color: #ff3b00;
+}
+
+.kraken-bubble.deep {
+  top: auto;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%) !important;
+}
+
+.judge p {
+  margin: 4px 0;
+}
+
+/* Labels over the buildings the kraken destroyed. */
+.ruin {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(58, 10, 22, 0.85);
+  color: #ffd9d9;
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.ruin.active {
+  z-index: 3;
+  padding: 6px 12px;
+  background: #ff2a00;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 0 0 3px rgba(255, 42, 0, 0.35), 0 3px 10px rgba(0, 0, 0, 0.35);
+  animation: throb 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes throb {
+  from {
+    box-shadow: 0 0 0 2px rgba(255, 42, 0, 0.3), 0 3px 10px rgba(0, 0, 0, 0.35);
+  }
+  to {
+    box-shadow: 0 0 0 10px rgba(255, 42, 0, 0.15), 0 3px 10px rgba(0, 0, 0, 0.35);
+  }
+}
+
+.destroyed-title {
+  margin: 8px 0 2px;
+  font-weight: 700;
+  color: #b3200a;
+}
+
+.destroyed {
+  margin: 0 0 6px;
+  padding-left: 20px;
+  color: #b3200a;
+}
+
+.kraken-bubble.warn {
+  background: #fff4d6;
+  border-color: #d98e00;
+}
+
+.kraken-bubble.mock_silence {
+  background: #eef0f3;
+  border-color: #56636f;
+  color: #2b3540;
+}
+
+/* The kraken's log: what it noticed, what it did and why, newest first. */
+.log-title {
+  color: #3a0a16;
+}
+
+.kraken-log {
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kraken-log li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  border-left: 4px solid #8394a1;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.03);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.kraken-log li.spare {
+  border-color: #2e9e5b;
+}
+
+.kraken-log li.warn {
+  border-color: #d98e00;
+}
+
+.kraken-log li.sink_building {
+  border-color: #ff2a00;
+}
+
+.kraken-log em {
+  font-style: normal;
+  font-weight: 700;
+}
+
+.kraken-log q {
+  font-style: italic;
+  color: #5c0f24;
+}
